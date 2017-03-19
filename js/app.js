@@ -469,10 +469,10 @@ $(function() {
 			width: 500,
 			center: true,
 			ulList: [
-				'bootstrap: 响应式布局',
-				'Vue: 动态数据绑定',
-				'React: 组件式开发',
-				'JQuery: 工具类库'
+				'Bootstrap: 用于开发移动设备优先的，响应式的WEB项目',
+				'Vue: 通过简洁的模板语法实现动态数据双向绑定，在阅读器项目中使用了此框架',
+				'React: 组件化开发模式，接管复杂的局部更新，在复杂场景下保证高性能',
+				'JQuery: 消除浏览器间兼容性问题，优化HTML文档操作、事件处理、动画设计和 Ajax 交互'
 			],
 			css: {
 				opacity: 0,
@@ -664,6 +664,7 @@ $(function() {
 		}) //point
 		.addComponent('point', {
 			type: 'point',
+			center: true,
 			width: 260,
 			height: 260,
 			data: [
@@ -673,7 +674,6 @@ $(function() {
 			],
 			css: {
 				top: '16%',
-				left: '25%',
 				fontFamily: 'bank'
 			}
 		})
@@ -711,9 +711,9 @@ $(function() {
 			data: [
 				['健身', .9],
 				['骑行', .8],
-				['料理', .7],
+				['摄影', .7],
 				['高尔夫', .6],
-				['手工', .5]
+				['桌球', .5]
 			],
 			css: {
 				top: '20%',
@@ -1401,7 +1401,7 @@ var H5ComponentPoint = function(name, cfg) {
 
 		// 设置zIndex、重设位置
 		point.css('zIndex', 100 - idx);
-		point.css('left', '-20%').css('top', 0);
+		point.css('left', 0).css('top', 0);
 
 
 		point.css('transition', 'all 1s ' + idx * .5 + 's')
