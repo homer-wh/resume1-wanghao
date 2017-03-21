@@ -136,7 +136,6 @@ body{
 
 /*H5 start*/
 
-/* H5对象的全局样式 */
 .h5{
     height: 100%;
 }
@@ -154,7 +153,6 @@ body{
 
 /*H5ComponentBase start*/
 
-/* 基本图文组件样式 */
 .h5_component{
     background-size: 100%;
     background-repeat: no-repeat;
@@ -241,7 +239,6 @@ body{
 
 /*H5ComponentBar start*/
 
-/* 柱状组件样式 */
 .h5_component_bar{
 }
 
@@ -307,15 +304,11 @@ body{
     -webkit-opacity:0;
 }
 
-
-
-
 /*H5ComponentBar end*/
 
 
 /*H5ComponentBar_v start*/
 
-/* 垂直柱状组件样式 */
 .h5_component_bar_v{
 }
 
@@ -397,14 +390,13 @@ body{
 
 /*H5ComponentPie start*/
 
-/* 饼图组件样式 */
 .h5_component_pie{
 }
 
 .h5_component_pie canvas{
     position: absolute;
     left: 0;
-    top: 0; /* 用canvas做动画，会进行分层，要用到  z-index */
+    top: 0;
     width: 100%;
     height: 100%;
 }
@@ -423,7 +415,6 @@ body{
 
 /*H5ComponentRing start*/
 
-/* 环图组件样式 */
 .h5_component_ring{
     font-family: bank;
 }
@@ -454,7 +445,6 @@ body{
 
 /*H5ComponentPoint start*/
 
-/* 散点图组件样式 */
 .h5_component_point{
     color: #fff;
 }
@@ -490,7 +480,6 @@ body{
     -webkit-opacity:0;
     -webkit-transform:scale(.1)
 }
-
 
 .h5_component_point_load .point_focus{
     box-shadow: 0 0 10px rgba(0,0,0,.5);
@@ -531,7 +520,6 @@ body{
 
 /*H5ComponentPolyline start*/
 
-/* 折线图组件样式 */
 .h5_component_polyline{
 
 }
@@ -575,7 +563,6 @@ body{
 
 /*H5ComponentRadar start*/
 
-/* 折线图组件样式 */
 .h5_component_radar{
 
 }

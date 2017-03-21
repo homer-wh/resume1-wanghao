@@ -1,36 +1,6 @@
 $(function() {
-
 	var h5 = new H5();
-
-	var windowWidth = $(window).width();
-	if (windowWidth < 320) {
-		windowWidth = 320;
-	}
-
-	h5.whenAddPage = function() {
-		this.addComponent('slide_up', {
-			bg: 'imgs/footer.png',
-			css: {
-				opacity: 0,
-				left: 0,
-				bottom: -20,
-				width: '100%',
-				height: '20px',
-				zIndex: 999
-			},
-			animateIn: {
-				opacity: 1,
-				bottom: '-1px'
-			},
-			animateOut: {
-				opacity: 0,
-				bottom: '-20px'
-			},
-			delay: 500
-		});
-	}
-
-
+	/* 流程：首先向 h5 容器里添加一个页面，接着再向页面添加不同的组件 */
 	h5
 		.addPage('face')
 		.addComponent('this_guy', {
@@ -843,162 +813,11 @@ $(function() {
 			},
 			delay: 800
 		})
-		.loader(['imgs/tail_back.png', 'imgs/tail_share.png', 'imgs/tail_slogan.png']);
+		.loader(['imgs/tail_back1.png']);
 
 });
 
-/* H5 Start */
-
-var H5 = function() {
-	this.id = ('h5_' + Math.random()).replace('.', '_');
-	this.el = $('<div class="h5" id="' + this.id + '">').hide();
-
-	this.page = [];
-
-	$('body').append(this.el);
-
-
-	/**
-	 * 新增一个页面
-	 * @param {string} name 组件的名称，会加入到 ClassName 中
-	 * @param {type} text 页内到默认文本
-	 * @return {H5} H5对象， 可以重复使用H5对象支持的方法
-	 */
-	this.addPage = function(name, text) {
-		var page = $('<div class="h5_page section">');
-
-		if (name != undefined) {
-			page.addClass('h5_page_' + name);
-		}
-		if (text != undefined) {
-			page.text(text);
-		}
-		this.el.append(page);
-
-		this.page.push(page);
-
-		return this;
-	}
-
-	/* 新增一个组件 */
-	this.addComponent = function(name, cfg) {
-		var cfg = cfg || {};
-		cfg = $.extend({
-			type: 'base'
-		}, cfg);
-
-		var component;
-		var page = this.page.slice(-1)[0];
-
-		switch (cfg.type) {
-			case 'point':
-				component = new H5ComponentPoint(name, cfg);
-				break;
-			case 'bar':
-				component = new H5ComponentBar(name, cfg);
-				break;
-			case 'bar_v':
-				component = new H5ComponentBar_v(name, cfg);
-				break;
-			case 'radar':
-				component = new H5ComponentRadar(name, cfg);
-				break;
-			case 'pie':
-				component = new H5ComponentPie(name, cfg);
-				break;
-			case 'polyline':
-				component = new H5ComponentPolyline(name, cfg);
-				break;
-			case 'ring':
-				component = new H5ComponentRing(name, cfg);
-				break;
-
-			default:
-				component = new H5ComponentBase(name, cfg);
-		}
-
-		page.append(component);
-		return this;
-	}
-
-	/* H5对象初始化呈现 */
-	this.loader = function() {
-		this.el.fullpage({
-			onLeave: function(index, nextIndex, direction) {
-				$(this).find('.h5_component').trigger('onLeave');
-			},
-			afterLoad: function(auchorLink, index) {
-				$(this).find('.h5_component').trigger('onLoad');
-			}
-		});
-		this.page[0].find('.h5_component').trigger('onLoad');
-		this.el.show();
-	}
-
-	return this;
-}
-
-/* H5 End */
-
-
-/* H5_loading Start */
-var H5_loading = function(images, firstPage) {
-
-		var id = this.id;
-
-		if (this._images === undefined) { //  第一次进入
-
-			this._images = (images || []).length;
-			this._loaded = 0;
-
-
-			window[id] = this; //   把当前对象存储在全局对象 window 中，用来进行某个图片加载完成之后的回调
-
-
-			for (s in images) {
-				var item = images[s];
-				var img = new Image;
-				img.onload = function() {
-					window[id].loader();
-				}
-				img.src = item;
-			}
-
-			$('#rate').text('0%');
-			return this;
-
-		} else {
-
-			this._loaded++;
-			$('#rate').text(((this._loaded / this._images * 100) >> 0) + '%');
-
-			if (this._loaded < this._images) {
-				return this;
-			}
-		}
-
-		window[id] = null;
-
-
-		this.el.fullpage({
-			onLeave: function(index, nextIndex, direction) {
-				$(this).find('.h5_component').trigger('onLeave');
-			},
-			afterLoad: function(anchorLink, index) {
-				$(this).find('.h5_component').trigger('onLoad');
-			}
-		});
-		this.page[0].find('.h5_component').trigger('onLoad');
-		this.el.show();
-		if (firstPage) {
-			$.fn.fullpage.moveTo(firstPage);
-		}
-	}
-	/* H5_loading End */
-
 /* H5ComponentBase Start */
-
-/* 基本图文组件对象 */
 
 var H5ComponentBase = function(name, cfg) {
 	var cfg = cfg || {};
@@ -1009,13 +828,15 @@ var H5ComponentBase = function(name, cfg) {
 	var component = $('<div class="h5_component ' + cls + ' h5_component_name_' + name + '" id="' + id + '">');
 
 	cfg.text && component.text(cfg.text);
+
+	/* 适配 DPR：2.0 的屏幕 */
 	cfg.width && component.width(cfg.width / 2);
 	cfg.height && component.height(cfg.height / 2);
 
 	cfg.css && component.css(cfg.css);
 	cfg.bg && component.css('backgroundImage', 'url(' + cfg.bg + ')');
 
-	// 如果是列表内容则添加列表
+	// 如果有项目列表则添加列表
 	if (cfg.listData) {
 		var dlList = $('<dl class="dlList">');
 		$.each(cfg.listData, function(idx, item) {
@@ -1031,7 +852,7 @@ var H5ComponentBase = function(name, cfg) {
 		component.append(dlList);
 	}
 
-	// 无序列表项
+	// 如果有无序列表项
 	if (cfg.ulList) {
 		var ulList = $('<ul class="ulList">');
 		$.each(cfg.ulList, function(idx, item) {
@@ -1051,22 +872,13 @@ var H5ComponentBase = function(name, cfg) {
 			left: '50%'
 		})
 	}
-	//  ... 很多自定义的参数
+	// 如果有点击事件
 	if (typeof cfg.onclick === 'function') {
 		component.on('click', cfg.onclick);
 	}
 
 
 	component.on('onLoad', function() {
-
-		// (1)支持relativeTo参数（修改 DOM 结构实现方法）
-		if (cfg.relativeTo) {
-			var parent = component.parent().find('.h5_component_name_' + cfg.relativeTo);
-			if (parent.size()) {
-				component.appendTo(parent);
-			}
-			cfg.relativeTo = false;
-		}
 
 		setTimeout(function() {
 			component.addClass(cls + '_load').removeClass(cls + '_leave');
@@ -1091,8 +903,6 @@ var H5ComponentBase = function(name, cfg) {
 /* H5ComponentBase End */
 
 /* H5ComponentBar End */
-
-/* 柱图组件对象 */
 
 var H5ComponentBar = function(name, cfg) {
 	var component = new H5ComponentBase(name, cfg);
@@ -1133,25 +943,19 @@ var H5ComponentBar = function(name, cfg) {
 
 /* H5ComponentBar_v Start */
 
-/* 垂直柱图组件对象 */
-
 var H5ComponentBar_v = function(name, cfg) {
 
-	//  任务二：(1) 完成 component 的初始化定义（补全 var component = ???）
 	var component = new H5ComponentBar(name, cfg);
 
-	//  任务二：(2) 完成 width 每个柱图中项目的宽度计算。（补全 var width = ???）
 	var width = (100 / cfg.data.length) >> 0;
 	component.find('.line').width(width + '%');
 
 	$.each(component.find('.rate'), function() {
 		var w = $(this).css('width');
-		//  任务二：(3) 把进度区的宽度重设为高度，并且取消原来的宽度
 		$(this).height(w).width('');
 	});
 
 	$.each(component.find('.per'), function() {
-		//  任务二：(4) 重新调整 DOM 结构，把百分比数值(.per)添加到 进度区 (.rate)中，和色块元素(.bg)同级。提示，获得 进度区 元素：$(this).prev() 
 		$(this).appendTo($(this).prev());
 	})
 
@@ -1162,16 +966,13 @@ var H5ComponentBar_v = function(name, cfg) {
 
 /* H5ComponentPie Start */
 
-/* 饼图组件对象 */
-
 var H5ComponentPie = function(name, cfg) {
 	var component = new H5ComponentBase(name, cfg);
 
-	//  绘制网格线 - 背景层
 	var w = cfg.width;
 	var h = cfg.height;
 
-	//  加入一个画布（网格线背景）
+	//  初始化 画布
 	var cns = document.createElement('canvas');
 	var ctx = cns.getContext('2d');
 	cns.width = ctx.width = w;
@@ -1181,7 +982,7 @@ var H5ComponentPie = function(name, cfg) {
 
 	var r = w / 2;
 
-	//  加入一个底图层
+	//  绘制底图层
 	ctx.beginPath();
 	ctx.fillStyle = '#eee';
 	ctx.strokeStyle = '#eee';
@@ -1190,7 +991,7 @@ var H5ComponentPie = function(name, cfg) {
 	ctx.fill();
 	ctx.stroke();
 
-	//  绘制一个数据层
+	//  绘制数据层
 	var cns = document.createElement('canvas');
 	var ctx = cns.getContext('2d');
 	cns.width = ctx.width = w;
@@ -1200,7 +1001,7 @@ var H5ComponentPie = function(name, cfg) {
 
 	var colors = ['red', 'green', 'blue', '#a00', 'orange']; //  备用颜色
 	var sAngel = 1.5 * Math.PI; //  设置开始的角度在 12 点位置
-	var eAngel = 0; //  结束角度
+	var eAngel = 0; //  初始化 结束角度
 	var aAngel = Math.PI * 2; //  100%的圆结束的角度 2pi = 360
 
 
@@ -1209,7 +1010,7 @@ var H5ComponentPie = function(name, cfg) {
 
 		var item = cfg.data[i];
 		var color = item[2] || (item[2] = colors.pop());
-
+		// 画完一个数据之后，更新结束角度
 		eAngel = sAngel + aAngel * item[1];
 
 		ctx.beginPath();
@@ -1221,33 +1022,24 @@ var H5ComponentPie = function(name, cfg) {
 		ctx.arc(r, r, r, sAngel, eAngel);
 		ctx.fill();
 		ctx.stroke();
+		// 更新下一次的开始角度
 		sAngel = eAngel;
 
-
-		//  加入所有的项目文本以及百分比
-
+		//  加入所有的项目文本
 		var text = $('<div class="text">');
 		text.text(cfg.data[i][0]);
-		// var per =  $('<div class="per">');
-		// per.text( cfg.data[i][1]*100 +'%'  );
-		// text.append(per);
 
 		var x = r + Math.sin(.5 * Math.PI - sAngel) * r;
 		var y = r + Math.cos(.5 * Math.PI - sAngel) * r;
-
-		// text.css('left', r / 2);
-		// text.css('top', r / 2);
 
 		if (x > w / 2) {
 			text.css('left', x / 2);
 		} else {
 			text.css('left', x / 2).css('transform', 'translateX(-100%)');
-			// text.css('right', (w - x) / 2);
 		}
 		if (y > h / 2) {
 			text.css('top', y / 2);
 		} else {
-			// text.css('top', y / 2);
 			text.css('bottom', (h - y) / 2);
 		}
 		if (cfg.data[i][2]) {
@@ -1255,10 +1047,9 @@ var H5ComponentPie = function(name, cfg) {
 		}
 		text.css('opacity', 0);
 		component.append(text);
-
 	}
 
-	//  加入一个蒙板层
+	//  绘制蒙板层
 	var cns = document.createElement('canvas');
 	var ctx = cns.getContext('2d');
 	cns.width = ctx.width = w;
@@ -1266,14 +1057,11 @@ var H5ComponentPie = function(name, cfg) {
 	$(cns).css('zIndex', 3);
 	component.append(cns);
 
-
 	ctx.fillStyle = '#eee';
 	ctx.strokeStyle = '#eee';
 	ctx.lineWidth = 1;
 
-
 	//  生长动画
-
 	var draw = function(per) {
 
 		ctx.clearRect(0, 0, w, h);
@@ -1299,7 +1087,7 @@ var H5ComponentPie = function(name, cfg) {
 	}
 	draw(0);
 	component.on('onLoad', function() {
-		//  饼图生长动画
+		//  动画原理 先清空，再重新画
 		var s = 0;
 		for (i = 0; i < 100; i++) {
 			setTimeout(function() {
@@ -1309,7 +1097,6 @@ var H5ComponentPie = function(name, cfg) {
 		}
 	});
 	component.on('onLeave', function() {
-		//  饼图退场动画
 		var s = 1;
 		for (i = 0; i < 100; i++) {
 			setTimeout(function() {
@@ -1326,27 +1113,20 @@ var H5ComponentPie = function(name, cfg) {
 
 /* H5ComponentRing Start */
 
-/* 环图组件对象 */
-
 var H5ComponentRing = function(name, cfg) {
 
 
-	if (cfg.data.length > 1) { //  环图应该只有一个数据
-		//  把数据格式化为只有一项，例如 a = [ [1] , [2] , [3] ] 格式化为： a=[ [1] ]
+	if (cfg.data.length > 1) {
+		// 去掉多余数据
 		cfg.data = [cfg.data[0]];
 	}
 
-	//  重设配置中的 type 参数，不仅利用 H5ComponentPie 构建 DOM 结构和 JS 逻辑，也使用其 CSS 样式定义
 	cfg.type = 'pie';
 	var component = new H5ComponentPie(name, cfg);
-
-	//  修正组件的样式，以支持在样式文件中组件的样式定义 .h5_component_ring 相关样式能生效
 	component.addClass('h5_component_ring');
-
 
 	var mask = $('<div class="mask">');
 
-	// 把创建好的遮罩元素添加到组件中
 	component.append(mask);
 
 	var text = component.find('.text');
@@ -1355,7 +1135,6 @@ var H5ComponentRing = function(name, cfg) {
 	if (cfg.data[0][2]) {
 		text.css('color', cfg.data[0][2]);
 	}
-	//  在遮罩元素( .mask ) 中添加文本信息
 	mask.append(text);
 
 	return component;
@@ -1365,23 +1144,18 @@ var H5ComponentRing = function(name, cfg) {
 
 /* H5ComponentPoint Start */
 
-/* 散点图表组件对象 */
-
 var H5ComponentPoint = function(name, cfg) {
 	var component = new H5ComponentBase(name, cfg);
+	// 设置一个基准大小
+	var base = cfg.data[0][1];
 
-	var base = cfg.data[0][1]; //  以第一个数据的 比例为大小的 100%
-
-	//   输出每个 Point
 	$.each(cfg.data, function(idx, item) {
 
 		var point = $('<div class="point point_' + idx + '" >');
 
 		var name = $('<div class="name">' + item[0] + '</div>');
 
-		// name.append(rate);
 		point.append(name);
-
 
 		var per = (item[1] / base * 100) + '%';
 
@@ -1390,7 +1164,6 @@ var H5ComponentPoint = function(name, cfg) {
 		if (item[2]) {
 			point.css('background-color', item[2]);
 		}
-
 
 		if (item[3] !== undefined && item[4] !== undefined) {
 			point.css('left', item[3]).css('top', item[4]);
@@ -1403,12 +1176,11 @@ var H5ComponentPoint = function(name, cfg) {
 		point.css('zIndex', 100 - idx);
 		point.css('left', 0).css('top', 0);
 
-
 		point.css('transition', 'all 1s ' + idx * .5 + 's')
 		component.append(point);
 	});
 
-	//  onLoad之后取出暂存的left、top 并且附加到 CSS 中
+	//  onLoad 动画
 	component.on('onLoad', function() {
 		component.find('.point').each(function(idx, item) {
 			$(item).css('left', $(item).data('left')).css('top', $(item).data('top'));
@@ -1421,6 +1193,7 @@ var H5ComponentPoint = function(name, cfg) {
 		})
 	})
 
+	// 通过类名 控制动画效果
 	component.find('.point').on('click', function() {
 
 		component.find('.point').removeClass('point_focus');
@@ -1436,24 +1209,20 @@ var H5ComponentPoint = function(name, cfg) {
 
 /* H5ComponentPolyline Start */
 
-/* 折线图组件对象 */
-
 var H5ComponentPolyline = function(name, cfg) {
 	var component = new H5ComponentBase(name, cfg);
 
-	/* 背景层 绘制网格线 */
 	var w = cfg.width;
 	var h = cfg.height;
 
-	// 加入一个画布（网格线背景）
+	// 初始化 画布（网格线背景）
 	var cns = document.createElement('canvas');
 	var ctx = cns.getContext('2d');
 	cns.width = ctx.width = w;
 	cns.height = ctx.height = h;
 	component.append(cns);
 
-
-	// 水平网格线 10份
+	// 水平网格线
 	var step = 10;
 	ctx.beginPath();
 	ctx.lineWidth = 1;
@@ -1461,11 +1230,8 @@ var H5ComponentPolyline = function(name, cfg) {
 
 	window.ctx = ctx;
 	for (var i = 0; i < step + 1; i++) {
-
 		var y = h / step * i;
-
 		ctx.moveTo(0, y);
-
 		ctx.lineTo(w, y);
 	}
 
@@ -1474,10 +1240,9 @@ var H5ComponentPolyline = function(name, cfg) {
 	var text_w = (w / step) >> 0;
 	for (var i = 0; i < step + 1; i++) {
 		var x = (w / step) * i;
-
 		ctx.moveTo(x, 0);
-
 		ctx.lineTo(x, h);
+		// 根据垂直网格 定位文本位置
 		if (cfg.data[i]) {
 			var text = $('<div class="text">');
 			var pro = $('<div class="pro">');
@@ -1487,9 +1252,7 @@ var H5ComponentPolyline = function(name, cfg) {
 			pro.css('width', text_w).css('left', 0);
 			text.append(pro);
 			component.append(text);
-
 		}
-
 	}
 	ctx.stroke();
 
@@ -1506,11 +1269,8 @@ var H5ComponentPolyline = function(name, cfg) {
 	 * @return {DOM}     
 	 */
 	var draw = function(per) {
-
 		// 清空画布
 		ctx.clearRect(0, 0, w, h);
-
-
 		ctx.beginPath();
 		ctx.lineWidth = 3;
 		ctx.strokeStyle = '#ff910a';
@@ -1541,7 +1301,7 @@ var H5ComponentPolyline = function(name, cfg) {
 
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = 'rgba(255, 136, 120, 0)';
-		// 绘制阴影
+		// 填充连线与画布边缘的区域
 		ctx.lineTo(x, h);
 		ctx.lineTo(0, h);
 		ctx.fillStyle = 'rgba(250, 184, 103, 0.2)';
@@ -1580,16 +1340,13 @@ var H5ComponentPolyline = function(name, cfg) {
 
 /* H5ComponentRadar Start */
 
-/* 雷达图组件对象 */
-
 var H5ComponentRadar = function(name, cfg) {
 	var component = new H5ComponentBase(name, cfg);
 
-	/* 背景层 绘制网格线 */
 	var w = cfg.width;
 	var h = cfg.height;
 
-	// 加入一个画布（网格线背景）
+	// 初始化 画布（网格线背景）
 	var cns = document.createElement('canvas');
 	var ctx = cns.getContext('2d');
 	cns.width = ctx.width = w;
@@ -1632,7 +1389,6 @@ var H5ComponentRadar = function(name, cfg) {
 
 		text.css('transition', 'all .5s ' + i * .1 + 's');
 
-		// text.css('left', x / 2).css('top', y / 2);
 		if (x > w / 2) {
 			text.css('left', x / 2 + 3);
 		} else {
@@ -1657,7 +1413,6 @@ var H5ComponentRadar = function(name, cfg) {
 	ctx.stroke();
 
 	// 绘制数据层
-	// 加入一个数据层画布
 	var cns = document.createElement('canvas');
 	var ctx = cns.getContext('2d');
 	cns.width = ctx.width = w;
@@ -1687,8 +1442,6 @@ var H5ComponentRadar = function(name, cfg) {
 		}
 		ctx.closePath();
 		ctx.stroke();
-
-
 		// 输出数据的点
 		ctx.fillStyle = '#ff7676';
 		for (var i = 0; i < step; i++) {
@@ -1702,11 +1455,7 @@ var H5ComponentRadar = function(name, cfg) {
 			ctx.fill();
 			ctx.closePath();
 		}
-
-
 	}
-
-	// 入场动画
 	component.on('onLoad', function() {
 		var s = 0;
 		for (var i = 0; i < 100; i++) {
@@ -1717,7 +1466,6 @@ var H5ComponentRadar = function(name, cfg) {
 		}
 	});
 
-	// 退场动画
 	component.on('onLeave', function() {
 		var s = 1;
 		for (var i = 0; i < 100; i++) {
@@ -1727,8 +1475,6 @@ var H5ComponentRadar = function(name, cfg) {
 			}, i * 10)
 		}
 	});
-
-
 	return component;
 }
 
